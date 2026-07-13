@@ -12,4 +12,11 @@
       <PackageReference Include="RazorLight" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="wwwroot\style.css" />
+      <Resource Include="wwwroot\style.css">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+    </ItemGroup>
+
 </Project>
