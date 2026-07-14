@@ -1,10 +1,9 @@
-﻿using RazorSSG.Model;
+﻿using RazorSSG;
+using RazorSSG.Model;
 using RazorSSG.Services;
 
-var dataProvider = new DataProvider(AppContext.BaseDirectory);
-var items = await dataProvider.LoadData<List<Item>>("items");
-var model = new PageModel() { Items = items };
+// TODO keep upper and lower case in mind
 
-string appRoot = AppContext.BaseDirectory;
-var processor = new TemplateProcessor(appRoot);
-await processor.Process("Index", model);
+var sb = new SiteBuilder();
+sb.AddPage(new PageInfo<IndexModel>("Index"));
+await sb.Generate();
