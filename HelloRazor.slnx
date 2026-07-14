@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/Okisioli.HelloRazor.Core/Okisioli.HelloRazor.Core.csproj" />
+  <Project Path="src/Okisioli.HelloRazor.Site/Okisioli.HelloRazor.Site.csproj" />
+</Solution>

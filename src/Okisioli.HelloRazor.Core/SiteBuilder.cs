@@ -1,7 +1,7 @@
 using System.Data;
-using RazorSSG.Core.Internals;
+using Okisioli.HelloRazor.Core.Internals;
 
-namespace RazorSSG.Core;
+namespace Okisioli.HelloRazor.Core;
 
 public class SiteBuilder
 {

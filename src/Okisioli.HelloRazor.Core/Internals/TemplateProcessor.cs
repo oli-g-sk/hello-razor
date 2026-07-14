@@ -1,6 +1,6 @@
 using RazorLight;
 
-namespace RazorSSG.Core.Internals;
+namespace Okisioli.HelloRazor.Core.Internals;
 
 internal class TemplateProcessor
 {
