@@ -10,13 +10,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="RazorLight" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Content Include="Data\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
       <Content Include="Templates\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
       <Content Include="wwwroot\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RazorSSG.Core\RazorSSG.Core.csproj" />
     </ItemGroup>
 
 </Project>
