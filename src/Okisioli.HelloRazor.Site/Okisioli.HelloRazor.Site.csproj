@@ -1,18 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
     <Description>Simple Razor-powered static site supporting optional JSON or text data sources, and also containing a GitHub workflow to make it a one-click deploy to GitHub pages.</Description>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Version>0.1.0</Version>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <PackageType>Template</PackageType>
-    <IncludeContentInPack>true</IncludeContentInPack>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
   </PropertyGroup>
 
   <ItemGroup>
