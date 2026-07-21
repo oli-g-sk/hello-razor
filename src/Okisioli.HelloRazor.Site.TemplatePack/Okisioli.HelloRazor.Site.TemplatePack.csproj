@@ -10,10 +10,90 @@
     <IncludeSymbols>false</IncludeSymbols>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <ContentTargetFolders>content</ContentTargetFolders>
+    <SiteProjectDirectory>$(MSBuildThisFileDirectory)..\Okisioli.HelloRazor.Site\</SiteProjectDirectory>
+    <TemplatePayloadRoot>$(MSBuildProjectDirectory)\obj\generated-template\hellorazor-site\</TemplatePayloadRoot>
+    <TemplateConfigDirectory>$(TemplatePayloadRoot).template.config\</TemplateConfigDirectory>
+    <TemplateProjectFile>$(TemplatePayloadRoot)Okisioli.HelloRazor.Site.csproj</TemplateProjectFile>
+    <CorePackageId>Okisioli.HelloRazor.Core</CorePackageId>
+    <CorePackageVersion>$(VersionPrefix)</CorePackageVersion>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
-    <Compile Remove="templates\**\*" />
-  </ItemGroup>
+  <UsingTask
+    TaskName="ReplaceProjectReferenceWithPackageReference"
+    TaskFactory="RoslynCodeTaskFactory"
+    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <ProjectFile ParameterType="System.String" Required="true" />
+      <ProjectReferenceInclude ParameterType="System.String" Required="true" />
+      <PackageId ParameterType="System.String" Required="true" />
+      <PackageVersion ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.Linq" />
+      <Using Namespace="System.Xml.Linq" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var document = XDocument.Load(ProjectFile);
+        var projectReferences = document
+            .Descendants("ProjectReference")
+            .Where(reference => string.Equals(
+                (string)reference.Attribute("Include"),
+                ProjectReferenceInclude,
+                System.StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        foreach (var isPackable in document.Descendants("IsPackable").ToList())
+        {
+            isPackable.Remove();
+        }
+
+        if (projectReferences.Count == 0)
+        {
+            Log.LogError($"Could not find ProjectReference '{ProjectReferenceInclude}' in '{ProjectFile}'.");
+        }
+        else
+        {
+            foreach (var projectReference in projectReferences)
+            {
+                projectReference.ReplaceWith(
+                    new XElement(
+                        "PackageReference",
+                        new XAttribute("Include", PackageId),
+                        new XAttribute("Version", PackageVersion)));
+            }
+
+            document.Save(ProjectFile);
+        }
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="PrepareTemplatePayload" BeforeTargets="_GetPackageFiles">
+    <ItemGroup>
+      <SiteTemplateSource
+        Include="$(SiteProjectDirectory)**\*"
+        Exclude="$(SiteProjectDirectory)bin\**;$(SiteProjectDirectory)obj\**;$(SiteProjectDirectory).template.config\**" />
+    </ItemGroup>
+
+    <RemoveDir Directories="$(TemplatePayloadRoot)" />
+    <MakeDir Directories="$(TemplatePayloadRoot);$(TemplateConfigDirectory)" />
+
+    <Copy
+      SourceFiles="@(SiteTemplateSource)"
+      DestinationFiles="@(SiteTemplateSource->'$(TemplatePayloadRoot)%(RecursiveDir)%(Filename)%(Extension)')" />
+
+    <WriteLinesToFile
+      File="$(TemplateConfigDirectory)template.json"
+      Overwrite="true"
+      Lines="$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)template.json'))" />
+
+    <ReplaceProjectReferenceWithPackageReference
+      ProjectFile="$(TemplateProjectFile)"
+      ProjectReferenceInclude="..\Okisioli.HelloRazor.Core\Okisioli.HelloRazor.Core.csproj"
+      PackageId="$(CorePackageId)"
+      PackageVersion="$(CorePackageVersion)" />
+
+    <ItemGroup>
+      <Content Include="$(TemplatePayloadRoot)**\*" Pack="true" PackagePath="content\%(RecursiveDir)%(Filename)%(Extension)" />
+    </ItemGroup>
+  </Target>
 </Project>
